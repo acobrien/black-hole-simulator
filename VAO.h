@@ -12,11 +12,12 @@ public:
 	GLuint ID;
 	VAO();
 
-	// Link a VBO to the VAO using a specified layout
+	// Link a VBO Attribute to the VAO using a specified layout
 	// Bind the VAO
 	// Unbind the VAO
 	// Delete the VAO
-	void LinkVBO(VBO VBO, GLuint layout);
+	void LinkAttrib(VBO VBO, GLuint layout, GLuint numComponents, 
+		GLenum type, GLsizeiptr stride, void* offset);
 	void Bind();
 	void Unbind();
 	void Delete();

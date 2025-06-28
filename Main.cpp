@@ -12,13 +12,13 @@ int main()
 
 	// Triangle vertex coordinates. Scale X-values by 2160 / 3840 = 0.5625
 	GLfloat vertices[] =
-	{
-		-0.5f * 0.5625, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower-left vertex
-		0.5f * 0.5625, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower-right vertex
-		0.0f * 0.5625, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f, // Top-center vertex
-		-0.25f * 0.5625, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner-left vertex
-		0.25f * 0.5625, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner-right vertex
-		0.0f * 0.5625, -0.5f * float(sqrt(3)) / 3, 0.0f // Bottom-center vertex
+	{ //				COORDINATES								|	COLORS
+		-0.5f  * 0.5625, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.0f, 0.2f, 0.5f, // Lower-left vertex
+		0.5f   * 0.5625, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.0f, 0.2f, 0.5f, // Lower-right vertex
+		0.0f   * 0.5625, 0.5f  * float(sqrt(3)) * 2 / 3, 0.0f,   0.0, 0.5f, 0.2f, // Top-center vertex
+		-0.25f * 0.5625, 0.5f  * float(sqrt(3)) / 6,     0.0f,   0.0f, 0.4f, 0.3f, // Inner-left vertex
+		0.25f  * 0.5625, 0.5f  * float(sqrt(3)) / 6,     0.0f,   0.0f, 0.4f, 0.3f, // Inner-right vertex
+		0.0f   * 0.5625, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.0f, 0.2f, 0.5f // Bottom-center vertex
 	};
 
 	GLuint indices[] =
@@ -39,7 +39,9 @@ int main()
 
 	// Set up a 4k window named "Black Hole Simulator"
 	// Handle failed window creation
-	GLFWwindow* window = glfwCreateWindow(3840, 2160, "Black Hole Simulator", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(3840, 2160, 
+		"Black Hole Simulator", NULL, NULL);
+
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -68,13 +70,18 @@ int main()
 	VBO VBO1(vertices, sizeof(vertices));
 	EBO EBO1(indices, sizeof(indices));
 
-	// Link VBO to VAO
-	VAO1.LinkVBO(VBO1, 0);
+	// Link VBO attributes such as coordinated and colors to VAO
+	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
+	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float),
+		(void*)(3 * sizeof(float)));
 
 	// Unbind objects to prevent accidental modification
 	VAO1.Unbind();
 	VBO1.Unbind();
 	EBO1.Unbind();
+
+	// Get id of uniform named 'scale'
+	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
 
 
 
@@ -87,9 +94,12 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT); 
 		
 		// Tell OpenGL to use this Shader Program
+		// Assign a value to the uniform. Must be after activating the Shader Program
+		shaderProgram.Activate();
+		glUniform1f(uniID, 0.3f);
+
 		// Tell OpenGL to use the VAO by binding it
 		// Draw the triangle with the GL_TRIANGLES primitive
-		shaderProgram.Activate();
 		VAO1.Bind();
 		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 
